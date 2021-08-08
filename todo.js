@@ -32,7 +32,10 @@ function createTask(input) {
 	labl.classList.add('container');
 	labl.innerHTML = input + 
 				"<input type='checkbox'>" +
-				"<span class='checkmark'></span>";
+				"<span class='checkmark'></span>" +
+				"<button id='del' onclick='deleteTask(this.parentNode)'>" + 
+				"<img src='./del.png' alt='delete' class='icon'></img>" +
+				"</button>";
 
 	var del = document.createElement("a");
 	del.inerHTML = "<a id='del'></a>";
@@ -41,4 +44,11 @@ function createTask(input) {
 	id += 1;
 	$('#Tasks').append(labl);
 	$('#newTask').val('');
+}
+
+
+// DELETE TASKS
+
+function deleteTask(parent) {
+	parent.remove();
 }
