@@ -19,8 +19,10 @@ function setDate() {
 $(document).ready(function() {
 	$('#newTask').keypress(function(e) {
 		if(e.keyCode==13){
-			var input = $('#newTask').val();
-			createTask(input);
+			if( /\S/.test($('#newTask').val())){
+				var input = $('#newTask').val();
+				createTask(input);
+			}
 		}
 	})
 })
