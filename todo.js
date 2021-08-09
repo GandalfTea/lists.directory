@@ -54,3 +54,14 @@ function createTask(input) {
 function deleteTask(parent) {
 	parent.remove();
 }
+
+
+// BACKGROUND COLOR
+
+
+function changeColor(color) {
+	$('body').animate( { backgroundColor: color }, 'normal');
+	$('#newTask').animate( {backgroundColor: color }, 0);
+	$('#del').animate({ backgroundColor: color }, 'normal');
+}
+
