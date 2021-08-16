@@ -38,8 +38,36 @@
 			<button class='background-color' id='blue' onclick='changeColor("#aec6cf")'></button>
 			<button class='background-color' id='yellow' onclick='changeColor("#EFBE7D")'></button>
 			<button class='background-color' id='white' onclick='changeColor("#fafafa")'></button>
+			<div class='color-input'>
+				<p>#</p>
+				<input type='text' id='colorInput'>
+			</div>
 		</div>
 
+		<!-- BOTTOM LOAD AND SAVE BUTTONS
+		<div class='line save-load'> 
+			<button id='saveButton' onclick=''>
+				<img src='upload.png' id='download'></button>
+			<button id='loadButton' onclick=''>
+				<img src='upload.png' id='upload'></button>
+		</div>
+		-->
+
+		<button id='options' onclick='openOptions()'>
+			<img src='./options.png' alt='options'>
+		</button>
+
+		<div id='popup'>
+			<div id='buttons'>
+				<button id='save' onclick='Save()'>Save</button>
+				<button id='load' onclick='Load()'>Load</button>
+				<button id='send' onclick='Send()'>Send</button>
+			</div>
+		</div>
+
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap" rel="stylesheet">
 
 		<script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="gandalftea" data-description="Support me on Buy me a coffee!" data-message="" data-color="#FF5F5F" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
 
