@@ -408,6 +408,33 @@ body {
 	margin-top: 30px;
 }
 
+.load-container {
+	display: flex;
+	flex-direction: row !important;
+}
+
+
+#del-load {
+	text-decoration: none;
+	outline: none;
+	border: none;
+	background-color: transparent;
+
+	margin-top: 14px;
+	margin-right: 20px;
+	margin-left: 10px;
+
+
+	height: 20px;
+	width: 20px;
+	opacity: 0%;
+	cursor: pointer;
+}
+
+.load-ul:hover #del-load, #del-load:hover {
+	opacity: 100%;
+}
+
 .load-item {
 	width: auto;
 	height: 40px;
@@ -421,21 +448,42 @@ body {
 }
 
 .load-item:hover {
-	font-size: 25px;
+	font-size: 22px;
 }
 
 .popup-send {
+	background-color: #fafafa !important;
 	opacity: 100% !important;
-	width: 350px !important;
-	height: 200px !important;
+	width: 500px !important;
+	height: 700px !important;
 }
 
-.send-notice {
+#send-guide-copy,
+#send-guide-qr {
+	width: 300px;
+	margin: auto;
+	margin-top: 50px;
 	font-family: "Lato", "Helvetica";
 	font-size: 20px;
-	font-weight: 500;
-	margin-left: 20px;
-	margin-top: 30px;
-	margin-bottom: 20px;
-	padding-right: 20px;
+	font-weight: 400;
+}
+
+#qr {
+	width: 350px;
+	height: 350px;
+	margin: auto;
+	margin-top: 50px;
+}
+
+#send-copy {
+	resize: none;
+	width: 350px;
+	height: 100px;
+	margin: 0 auto;
+	display: block;
+	margin-top: 20px;
+	padding: 20px;
+	background-color: transparent;
+	border: 1.5px solid #202020;
+	border-radius: 5px;
 }

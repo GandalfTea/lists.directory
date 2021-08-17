@@ -1,4 +1,7 @@
 
+// READ LINK FOR DATA (if you open list)
+checkLoad();
+
 // SET DATE
 
 setDate();
@@ -22,7 +25,6 @@ $(document).ready(function() {
 			if( /\S/.test($('#newTask').val())){
 				var input = $('#newTask').val();
 				createTask(input);
-				//snitch();
 			}
 		}
 	})
@@ -132,6 +134,10 @@ function closeOptions() {
 	$('.load-title').fadeOut(100, function() { $(this).remove(); });
 	$('.load-enc').fadeOut(100, function() { $(this).remove(); });
 	$('.send-notice').fadeOut(100, function() { $(this).remove(); });
+	$('#send-guide-qr').fadeOut(100, function() { $(this).remove(); });
+	$('#send-guide-copy').fadeOut(100, function() { $(this).remove(); });
+	$('#qr').fadeOut(100, function() { $(this).remove(); });
+	$('#send-copy').fadeOut(100, function() { $(this).remove(); });
 	menuOpened = false;
 }
 
@@ -239,7 +245,21 @@ function Load() {
 		item.classList.add("load-item");
 		item.innerText = i[0];
 		item.setAttribute("onclick", "openList(this.innerHTML)");
-		ul.appendChild(item);
+
+		var del = document.createElement('button');
+		var img = document.createElement("img");
+		var container = document.createElement("div");
+		img.src = "./del.png";
+		img.classList.add("icon");
+		del.id = "del-load";
+		del.appendChild(img);
+		del.setAttribute("onclick", "delSave(this.parentElement)");
+		container.classList.add("load-container");
+
+
+		container.appendChild(del);
+		container.appendChild(item);
+		ul.appendChild(container);
 
 	}
 
@@ -260,10 +280,9 @@ function Load() {
 
 function openList(list) {
 	$('#Tasks').empty();
-	//console.log(list);	
 	var rawItems = window.localStorage.getItem(list);
 	var items = JSON.parse(rawItems);
-	console.log(items);
+	//console.log(items);
 	for(const i of Object.keys(items)) {
 		createTask(items[i]);	
 	}
@@ -277,17 +296,86 @@ function Send() {
 	$('#buttons').hide();
 	popup.classList.remove('popup-open');	
 
-	var notice = document.createElement("p");
-	notice.innerText = "You will soon be able to send lists as QR codes or Data Links to your phone or other devices.\n Please contain your urges for the time being";
-	notice.classList.add('send-notice');
-	popup.appendChild(notice);
+	// put in container
 	
+	// create link with variables
+	var strings = "";
+	const tasks = document.getElementById('Tasks').getElementsByTagName("label");
+
+	for(let i of tasks) {
+		strings += i.innerHTML.split("<")[0] + "/+/";
+	}
+
+	content = btoa(strings);
+	var load_url = `www.todolist.live/?content=${content}`;
+	console.log(load_url);
+
+	
+	var guide = document.createElement("p");	
+	guide.innerText = "Scan this with your phone camera";
+	guide.id = "send-guide-qr";
+	popup.appendChild(guide);
+
+	
+	// generate qr code and link embed.
+	var qr_display = document.createElement("div");
+	qr_display.id = "qr";
+	popup.appendChild(qr_display);
+	new QRCode(document.getElementById("qr"), load_url);
+	
+	var guide_url = document.createElement("p");	
+	guide_url.innerText = "Or copy and load this link";
+	guide_url.id = "send-guide-copy";
+	popup.appendChild(guide_url);
+
+
+	var text = document.createElement("textarea");
+	text.innerText = load_url;
+	text.readOnly = true;
+	text.id = "send-copy";
+	popup.appendChild(text);
+
+
 	// close
 	document.getElementById('options').setAttribute("onClick", "closeOptions()");
 	setTimeout(function(){
 		window.addEventListener( "click", clickOutside);
 	}, 500);
 }
+
+
+// delete save from localStorage.
+// called in Load().
+function delSave(save) {
+	save.remove();
+	window.localStorage.removeItem(save.innerText);
+}
+
+
+
+
+
+// read URL variable and load data into list
+function checkLoad() {
+	var url = window.location.href;
+	if(url.includes("content")) {
+		console.log("DATA LINK FOUND");
+		// read data
+		var data = url.split("content");
+		data = data[1].substring(1);
+		data = atob(data);
+		data = data.split("/+/");
+		data.splice(-1);
+
+		for(var i of data) {
+			createTask(i);
+		}
+	}
+}
+
+
+
+
 
 
 // KEYBOARD SHORTCUTS
@@ -334,3 +422,5 @@ $(document).on("keyup", function(e) {
 		}
 	}
 })
+
+
