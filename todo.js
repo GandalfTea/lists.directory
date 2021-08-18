@@ -443,6 +443,14 @@ $(document).on("keypress", function(e) {
 	}
 })
 
+// m, M for Save
+$(document).on("keypress", function(e) {
+	if(e.key == 'm' && !menuOpened || e.key == 'M' && !menuOpened) {
+		Send();
+	}
+})
+
+
 // Esc for exit
 $(document).on("keyup", function(e) {
 	if(e.key == 'Escape') {
