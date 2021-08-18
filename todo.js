@@ -1,4 +1,9 @@
 
+
+var ID = 0;
+
+
+
 // READ LINK FOR DATA (if you open list)
 checkLoad();
 
@@ -30,7 +35,6 @@ $(document).ready(function() {
 	})
 })
 
-var id = 1;
 
 function createTask(input) {
 	var labl = document.createElement("label");
@@ -45,10 +49,12 @@ function createTask(input) {
 	var del = document.createElement("a");
 	del.inerHTML = "<a id='del'></a>";
 
-	labl.id = id;
-	id += 1;
+	labl.id = String(ID);
+	ID += 1;
 	$('#Tasks').append(labl);
 	$('#newTask').val('');
+
+	return labl;
 }
 
 
@@ -57,8 +63,6 @@ function createTask(input) {
 function deleteTask(parent) {
 	parent.remove();
 }
-
-
 
 
 // BACKGROUND COLOR
@@ -188,9 +192,12 @@ function Save() {
 				const tasks = document.getElementById('Tasks').getElementsByTagName("label");
 
 				for(let i of tasks) {
-					items[i.id] = i.innerHTML.split("<")[0];
+					if(i.getElementsByTagName("input")[0].checked){
+						items[i.id] = "`/" + i.innerHTML.split("<")[0];
+					}else {
+						items[i.id] = i.innerHTML.split("<")[0];
+					}
 				}
-
 				window.localStorage.setItem(input, JSON.stringify(items));
 				closeOptions();
 				//console.log(window.localStorage.getItem(input));
@@ -284,7 +291,15 @@ function openList(list) {
 	var items = JSON.parse(rawItems);
 	//console.log(items);
 	for(const i of Object.keys(items)) {
-		createTask(items[i]);	
+		var checked = false;
+		if(items[i].includes("`/")){
+			checked = true;
+			items[i] = items[i].substr(2);
+		}
+		var id = createTask(items[i]);	
+		if(checked){
+			id.getElementsByTagName("input")[0].checked = true;
+		}
 	}
 }
 
@@ -303,7 +318,11 @@ function Send() {
 	const tasks = document.getElementById('Tasks').getElementsByTagName("label");
 
 	for(let i of tasks) {
-		strings += i.innerHTML.split("<")[0] + "/+/";
+		if(i.getElementsByTagName("input")[0].checked){
+			strings += "`/" + i.innerHTML.split("<")[0] + "/+/"; //identify checked tasks
+		}else {
+			strings += i.innerHTML.split("<")[0] + "/+/";
+		}
 	}
 
 	content = btoa(strings);
@@ -313,7 +332,8 @@ function Send() {
 	// padding to combat that.
 	console.log(load_url.length);
 	if(load_url.length >= 192 && load_url.length <= 220) {
-		while(!(load_url.length >= 220 && load_url.length % 3 == 0)) {
+		load_url += "?";
+		while(load_url.length <= 220) {
 			load_url += "=";
 		}
 	}
@@ -368,16 +388,24 @@ function delSave(save) {
 function checkLoad() {
 	var url = window.location.href;
 	if(url.includes("content")) {
-		console.log("DATA LINK FOUND");
-		// read data
+		//console.log("DATA LINK FOUND");
 		var data = url.split("content");
 		data = data[1].substring(1);
+		data = data.split("?")[0];
 		data = atob(data);
 		data = data.split("/+/");
 		data.splice(-1);
 
 		for(var i of data) {
-			createTask(i);
+			var checked = false;
+			if(i.includes("`/")){
+				checked = true;
+				i = i.substr(2);
+			}
+			var id = createTask(i);
+			if(checked){
+				id.getElementsByTagName("input")[0].checked = true;
+			}
 		}
 	}
 }
