@@ -308,7 +308,16 @@ function Send() {
 
 	content = btoa(strings);
 	var load_url = `www.todolist.live/?content=${content}`;
-	console.log(load_url);
+
+	// qrcode.js had a bug that if the url len is between 192 - 220 it crashed.
+	// padding to combat that.
+	console.log(load_url.length);
+	if(load_url.length >= 192 && load_url.length <= 220) {
+		while(!(load_url.length >= 220 && load_url.length % 3 == 0)) {
+			load_url += "=";
+		}
+	}
+	console.log(load_url.length);
 
 	
 	var guide = document.createElement("p");	
