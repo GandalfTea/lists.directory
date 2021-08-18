@@ -1,6 +1,6 @@
 
 Simple online to-do list.       
-Live at : [todolist.live](https://todolist.live)
+Live at : [lists.directory](https://lists.directory)
 
 TODO:
 * qrcode.js 192-220 bug padding
