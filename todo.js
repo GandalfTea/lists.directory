@@ -4,8 +4,11 @@ var ID = 0;
 
 
 
+
 // READ LINK FOR DATA (if you open list)
 checkLoad();
+
+		// VARIOUS UI
 
 // SET DATE
 
@@ -16,12 +19,15 @@ function setDate() {
 	const day = date.getDate();
 	const month = date.toLocaleString('default', { month: 'long' });
 	const fullDate = day + " " + month;
+	
+	// quick misplaced bug fix (do not judge)
+	$('#buttons').fadeOut(0);
 
 	document.getElementById('date-top').innerText = fullDate;
 }
 
 
-// INPUT TASKS
+		// INPUT TASKS
 
 
 $(document).ready(function() {
@@ -65,14 +71,13 @@ function deleteTask(parent) {
 }
 
 
-// BACKGROUND COLOR
+		// BACKGROUND COLOR
 
 
 function changeColor(color) {
 	$('body').animate( { backgroundColor: color }, 'normal');
 	$('#newTask').animate( {backgroundColor: color }, 0);
 	$('#del').animate({ backgroundColor: color }, 'normal');
-	$('#popup').animate({ backgroundColor: color }, 'normal');
 }
 
 
@@ -93,8 +98,7 @@ $(document).ready(function() {
 
 
 
-// OPTIONS MENU
-
+		// OPTIONS MENU
 
 function openOptions() {
 	menuOpened = true;
@@ -114,13 +118,22 @@ function openOptions() {
 
 function clickOutside(e) {
 	if(document.getElementById('popup').contains(e.target)){
-	} else {
+	} else if (!(document.getElementById('popup').contains(e.target))){
+		// this function runs later than the focus on the #newtask input.
+		// make sure it does not falsely accept keybord shortcuts.
+	 	if($('#newTask').is(':focus')) {
+		} else{
+			menuOpened = false;
+		}
 		closeOptions();
 	}
 }
 
 
 function closeOptions() {
+
+	console.log("CALLER : " + closeOptions.caller);
+
 	const popup = document.getElementById('popup');
 	popup.classList.remove('popup-open');
 	popup.classList.remove('popup-save');
@@ -133,6 +146,7 @@ function closeOptions() {
 	
 
 	// Remove all other layout after closing
+	// shitty way of doing it but it doesn't seem to be causing any performance issues
 	$('#save-input').fadeOut(100, function() { $(this).remove(); });
 	$('#save-button').fadeOut(100, function() { $(this).remove(); });
 	$('.load-title').fadeOut(100, function() { $(this).remove(); });
@@ -142,26 +156,31 @@ function closeOptions() {
 	$('#send-guide-copy').fadeOut(100, function() { $(this).remove(); });
 	$('#qr').fadeOut(100, function() { $(this).remove(); });
 	$('#send-copy').fadeOut(100, function() { $(this).remove(); });
-	menuOpened = false;
+	return;
 }
 
 
 
+
+
+		// SAVING AND SHARING
+
 /*	
-	* QR Code Share 
-	* Base64 String Share
-	* localStorage Save
+	* QR Code
+	* Base64 Link
+	* localStorage 
 */
 
 var menuOpened = false;		// for keyboard shortcuts
 
 // input name for saved list and add to localStorage.
-// only save name of task.
+// save name and tick status
 function Save() {
+	
 	menuOpened = true;
+		
 	const popup = document.getElementById('popup');
 	popup.classList.add('popup-save');
-
 	$('#buttons').hide();
 	popup.classList.remove('popup-open');	
 
@@ -180,44 +199,45 @@ function Save() {
 	popup.appendChild(input);
 	popup.appendChild(save);
 
-	$('#save-input').focus();
+	// do not capture the shortcut 's'
+	setTimeout(function() {
+		$('#save-input').focus();
+	}, 500);
 	
-	// Save	
-	// Press Enter
-	$('#save-input').keypress(function(e) {
-		if(e.keyCode==13){
-			if( /\S/.test($('#save-input').val())){
-				var input = $('#save-input').val();
-				var items = {};
-				const tasks = document.getElementById('Tasks').getElementsByTagName("label");
 
-				for(let i of tasks) {
-					if(i.getElementsByTagName("input")[0].checked){
-						items[i.id] = "`/" + i.innerHTML.split("<")[0];
-					}else {
-						items[i.id] = i.innerHTML.split("<")[0];
-					}
+
+	// PARSE AND SAVE IN MEMORY
+	function saveLocal() {
+		if( /\S/.test($('#save-input').val())){
+			var input = $('#save-input').val();
+			var items = {};
+			const tasks = document.getElementById('Tasks').getElementsByTagName("label");
+
+			for(let i of tasks) {
+				if(i.getElementsByTagName("input")[0].checked){
+					// TODO: this might be a shitty way to save checkmarks.
+					// The initial idea was to have char that people would not use in tasks.
+					items[i.id] = "`/" + i.innerHTML.split("<")[0];
+				}else {
+					items[i.id] = i.innerHTML.split("<")[0];
 				}
-				window.localStorage.setItem(input, JSON.stringify(items));
-				closeOptions();
-				//console.log(window.localStorage.getItem(input));
 			}
+			window.localStorage.setItem(input, JSON.stringify(items));
+			closeOptions();
+		}
+	}
+
+	$('#save-input').keypress(function(e) {
+		if(e.keyCode==13){		// Press ENTER
+			saveLocal();
 		}
 	})
 	
 	$('#save-button').click( function() {
-		var items = {};
-		const tasks = document.getElementById('Tasks').getElementsByTagName("label");
-
-		for(let i of tasks) {
-			items[i.id] = i.innerHTML.split("<")[0];
-		}
-		var input = $('#save-input').val();
-		window.localStorage.setItem(input, JSON.stringify(items));
-		closeOptions();
+		saveLocal();
 	})
 
-	// Close
+	// CLOSE
 	document.getElementById('options').setAttribute("onClick", "closeOptions()");
 	setTimeout(function(){
 		window.addEventListener( "click", clickOutside);
@@ -225,7 +245,6 @@ function Save() {
 }
 
 // read keys from localStorage and load on click.
-// TODO: Load from QR and Base64.
 function Load() {
 	menuOpened = true;
 	const popup = document.getElementById('popup');
@@ -246,50 +265,77 @@ function Load() {
 	ul.classList.add("load-ul");
 
 
-	// read
-	for(let i of Object.entries(localStorage)){
-		var item = document.createElement('button');
-		item.classList.add("load-item");
-		item.innerText = i[0];
-		item.setAttribute("onclick", "openList(this.innerHTML)");
+	// check if any entry
+	if(Object.entries(localStorage) == 0){
+		var really = document.createElement("img");
+		really.src = './cat.jpg';
+		really.id = 'really';
+		enc.append(really);
+	} else {
+		$("really").remove();
 
-		var del = document.createElement('button');
-		var img = document.createElement("img");
-		var container = document.createElement("div");
-		img.src = "./del.png";
-		img.classList.add("icon");
-		del.id = "del-load";
-		del.appendChild(img);
-		del.setAttribute("onclick", "delSave(this.parentElement)");
-		container.classList.add("load-container");
+		// read
+		for(let i of Object.entries(localStorage)){
+			var item = document.createElement('button');
+			item.classList.add("load-item");
+			item.innerText = i[0];
+			item.setAttribute("onclick", "openList(this.innerHTML)");
+	
+			var del = document.createElement("button");
+			var add = document.createElement("button");
+			var img = document.createElement("img");
+			var add_img = document.createElement("img");
+			var container = document.createElement("div");
+			
+			// delete
+			img.src = "./del.png";
+			img.classList.add("icon");
+			del.id = "del-load";
+			del.appendChild(img);
+			del.setAttribute("onclick", "delSave(this.parentElement)");
 
+			// add to current list button
+			add_img.src = './plus.png';
+			add_img.id = 'load-add-img';
+			add_img.classList.add('icon');
+			add.appendChild(add_img);
+			add.setAttribute("onclick", "openList(this.parentElement.getElementsByTagName('button')[1].innerHTML, true)")
+			add.id = 'load-add';
 
-		container.appendChild(del);
-		container.appendChild(item);
-		ul.appendChild(container);
-
+			container.classList.add("load-container");
+			
+			container.appendChild(del);
+			container.appendChild(item);
+			container.appendChild(add);
+			ul.appendChild(container);
+		}
 	}
 
 	enc.appendChild(ul);
 	popup.appendChild(enc);
 	
-
-	// QR and Base64
-	// . . .
-
-
-	// close
+	// CLOSE
 	document.getElementById('options').setAttribute("onClick", "closeOptions()");
 	setTimeout(function(){
 		window.addEventListener( "click", clickOutside);
 	}, 500);
 }
 
-function openList(list) {
-	$('#Tasks').empty();
+function delSave(save) {
+	save.remove();
+	window.localStorage.removeItem(save.innerText);
+}
+
+function openList(list, include = false) {
+
+	if(include) {
+		// do not remove
+	}else {
+		$('#Tasks').empty();
+	}
+		
 	var rawItems = window.localStorage.getItem(list);
 	var items = JSON.parse(rawItems);
-	//console.log(items);
 	for(const i of Object.keys(items)) {
 		var checked = false;
 		if(items[i].includes("`/")){
@@ -304,6 +350,9 @@ function openList(list) {
 }
 
 
+
+
+// Share as QR or Base64 Link
 function Send() {
 	menuOpened = true;
 	const popup = document.getElementById('popup');
@@ -311,12 +360,11 @@ function Send() {
 	$('#buttons').hide();
 	popup.classList.remove('popup-open');	
 
-	// put in container
-	
 	// create link with variables
 	var strings = "";
 	const tasks = document.getElementById('Tasks').getElementsByTagName("label");
 
+	//TODO: Change separator '/+/' because it takes too much memory
 	for(let i of tasks) {
 		if(i.getElementsByTagName("input")[0].checked){
 			strings += "`/" + i.innerHTML.split("<")[0] + "/+/"; //identify checked tasks
@@ -337,8 +385,9 @@ function Send() {
 			load_url += "=";
 		}
 	}
-	console.log(load_url.length);
+	
 
+	//UI
 	
 	var guide = document.createElement("p");	
 	guide.innerText = "Scan this with your phone camera";
@@ -353,7 +402,7 @@ function Send() {
 	new QRCode(document.getElementById("qr"), load_url);
 	
 	var guide_url = document.createElement("p");	
-	guide_url.innerText = "Or copy and load this link";
+	guide_url.innerText = "or copy and load this link";
 	guide_url.id = "send-guide-copy";
 	popup.appendChild(guide_url);
 
@@ -365,21 +414,12 @@ function Send() {
 	popup.appendChild(text);
 
 
-	// close
+	// CLOSE
 	document.getElementById('options').setAttribute("onClick", "closeOptions()");
 	setTimeout(function(){
 		window.addEventListener( "click", clickOutside);
 	}, 500);
 }
-
-
-// delete save from localStorage.
-// called in Load().
-function delSave(save) {
-	save.remove();
-	window.localStorage.removeItem(save.innerText);
-}
-
 
 
 
@@ -388,7 +428,6 @@ function delSave(save) {
 function checkLoad() {
 	var url = window.location.href;
 	if(url.includes("content")) {
-		//console.log("DATA LINK FOUND");
 		var data = url.split("content");
 		data = data[1].substring(1);
 		data = data.split("?")[0];
@@ -410,10 +449,51 @@ function checkLoad() {
 	}
 }
 
+if(screen.width <= 900) {
+
+} else {
+	// Inform the user about the keybord shortcuts
+	function infoPopup() {
+		var div = document.createElement("div");
+		var text = document.createElement("p");
+		var exit = document.createElement("button");
+		var img = document.createElement("img");
+		
+		img.src = './del.png'
+		img.classList.add("icon");
+		exit.appendChild(img);
+		exit.id = 'info-popup-exit';
+		exit.setAttribute("onclick", "infoPopupClose()");
+
+		text.innerHTML = " <i><em>i</em></i> &ensp; for Input" + "<br>" +
+						" <i><em>s</em></i> &ensp; for Save" + "<br>" + 
+						" <i><em>l</em></i> &ensp; for Load" + "<br>" +
+						" <i><em>m</em></i> &ensp; for Share" + "<br>";
+		div.id='info-popup-div';
+		text.id='info-popup-text';
+		
+		div.appendChild(exit);
+		div.appendChild(text);
+
+		$(document.body).append(div);
+		$('#info-popup-div').fadeIn(300);
+	}
+
+	function infoPopupClose() {
+		$('#info-popup-div').remove();
+	}
 
 
-
-
+	$(document).ready(function() {
+		setTimeout(function() {
+			infoPopup();
+		}, 1000);
+		
+		setTimeout(function() {
+				$('#info-popup-div').fadeOut( 300, function() { $(this).remove(); } );
+		}, 10000);
+	})
+}
 
 // KEYBOARD SHORTCUTS
 
@@ -460,6 +540,15 @@ $(document).on("keyup", function(e) {
 	}
 })
 
+// i for input new task
+$(document).on("keypress", function(e) {
+	if(e.key == 'i' && !menuOpened) {
+		setTimeout(function() {
+			$('#newTask').focus();
+		}, 50);
+	}
+})
+
 $(document).on("keyup", function(e) {
 	if(e.key == 'Escape') {
 		if($('#newTask'.focus)) {
@@ -469,3 +558,6 @@ $(document).on("keyup", function(e) {
 })
 
 
+
+// focus on input at startup 
+$('#newTask').focus();

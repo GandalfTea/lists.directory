@@ -304,6 +304,7 @@ body {
 	flex-direction: column;
 }
 
+#improve,
 #save,
 #load,
 #send {
@@ -316,6 +317,12 @@ body {
 	font-size: 18px;
 	padding-top: 10px;
 	padding-bottom: 10px;
+	margin: auto;
+}
+
+#improve {
+	font-weight: 300;
+	width: 70px;
 	margin: auto;
 }
 
@@ -333,7 +340,7 @@ body {
 .popup-open {
 	opacity: 100% !important;
 	width: 150px !important;
-	height: 150px !important;
+	height: 190px !important;
 }
 
 .popup-save {
@@ -398,6 +405,7 @@ body {
 	width: 100%;
 	overflow: hidden;
 	overflow-y: scroll;
+	background-color: #EEE;
 }
 
 .load-ul {
@@ -406,11 +414,21 @@ body {
 	font-family: "Lato";
 	font-size: 20px;
 	margin-top: 30px;
+	overflow-X: hidden;
+}
+
+#really {
+	height: 100%;
+	width: 100%;
+	opacity: 20%;
 }
 
 .load-container {
+	height: auto;
 	display: flex;
 	flex-direction: row !important;
+	position: relative;
+	margin-bottom: 20px;
 }
 
 
@@ -420,7 +438,8 @@ body {
 	border: none;
 	background-color: transparent;
 
-	margin-top: 14px;
+	margin: auto;
+	margin-top: 6px;
 	margin-right: 20px;
 	margin-left: 10px;
 
@@ -431,24 +450,59 @@ body {
 	cursor: pointer;
 }
 
+#del-load:hover  #del-load img{
+	opacity: 100%; 
+}
+
+#load-add-img {
+	height: 20px;
+	width: 20px;
+	opacity: 100%;
+	margin: auto;
+	margin-left: -3.5px;
+	margin-top: 1px;
+}
+
+#load-add {
+	height: 25px;
+	width: 25px;
+	border-radius: 50px;
+	background-color: #DDD;
+	margin:auto;
+	margin-left: 10px;
+	outline: none;
+	border: none;
+	opacity: 0%;
+	cursor: pointer;
+}
+
+#load-add:hover {
+	background-color: #BBB;
+}
+
 .load-ul:hover #del-load, #del-load:hover {
+	opacity: 100%;
+}
+
+.load-ul:hover #load-add, #load-add:hover {
 	opacity: 100%;
 }
 
 .load-item {
 	width: auto;
-	height: 40px;
+	height: auto;
 	outline: none;
 	border: none;
 	text-decoration: none;
 	font-family: "Lato", "Helvetica";
-	font-size: 20px;
-	margin-right: 30px;
+	font-size: 1em;
 	background-color: transparent;
+	text-align: left;
 }
 
 .load-item:hover {
-	font-size: 22px;
+	text-shadow: 0px 0px 0.5px black;
+	cursor: pointer;
 }
 
 .popup-send {
@@ -505,3 +559,45 @@ body {
 		width: 80%;
 	}
 }
+
+
+#info-popup-div {
+	position: fixed;
+	bottom: 50px;
+	left: 100px;
+	height: 150px;
+	width: 250px;
+	background-color: #EEE;
+	border-radius: 10px;
+	display: none;
+}
+
+#info-popup-text {
+	display: inline-block;
+	width: 200px;
+	padding: 20px;
+	padding-top: 0px;
+	font-size: 17px;
+	font-family: "Lato";
+	text-align: center;
+	margin-left: 25px;
+}
+
+#info-popup-text em {
+	font-weight: 700;
+}
+
+#info-popup-exit {
+	position: relative;
+	outline: none;
+	border: none;
+	margin-left: 87%;
+	margin-top: 10px;
+	margin-bottom: 10px;
+	padding: 0;
+}
+
+#info-popup-exit:hover img{
+	opacity: 70%;
+}
+
