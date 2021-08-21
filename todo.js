@@ -10,21 +10,37 @@ checkLoad();
 
 		// VARIOUS UI
 
+// quick misplaced bug fix (do not judge)
+$('#buttons').fadeOut(0);
+
 // SET DATE
 
-setDate();
+setTitle();
+setInterval(function() {
+	setTitle();
+}, 1000);
 
-function setDate() {
-	const date = new Date();
-	const day = date.getDate();
-	const month = date.toLocaleString('default', { month: 'long' });
-	const fullDate = day + " " + month;
+function setTitle() {
+	if(document.getElementById('menu-date').checked) {
+		const date = new Date();
+		const day = date.getDate();
+		const month = date.toLocaleString('default', { month: 'long' });
+		const fullDate = day + " " + month;
+		document.getElementById('date-top').innerText = fullDate; 
+
+	} else if (document.getElementById('countdown').checked) {
+		var midnight = new Date();
+		midnight.setHours(24,0,0,0);
+		var now = new Date();
+		var hours = parseInt(Math.abs(midnight - now) / (1000 * 60 * 60) % 24);
+		var min = parseInt(Math.abs(midnight.getTime() - now.getTime()) / (1000 * 60) % 60);
+		var sec = parseInt(Math.abs(midnight.getTime() - now.getTime()) / (1000) % 60); 
+		var time = String(hours + " : " + min + " : " + sec);
 	
-	// quick misplaced bug fix (do not judge)
-	$('#buttons').fadeOut(0);
-
-	document.getElementById('date-top').innerText = fullDate;
+		document.getElementById('date-top').innerText = time; 
+	}
 }
+
 
 
 		// INPUT TASKS
@@ -139,6 +155,7 @@ function closeOptions() {
 	popup.classList.remove('popup-save');
 	popup.classList.remove('popup-load');
 	popup.classList.remove('popup-send');
+	popup.classList.remove('popup-improve');
 	
 
 	document.getElementById('options').setAttribute("onClick", "openOptions()");
@@ -156,6 +173,9 @@ function closeOptions() {
 	$('#send-guide-copy').fadeOut(100, function() { $(this).remove(); });
 	$('#qr').fadeOut(100, function() { $(this).remove(); });
 	$('#send-copy').fadeOut(100, function() { $(this).remove(); });
+	$('#improve-text').fadeOut(100, function() { $(this).remove(); });
+	$('#improve-title').fadeOut(100, function() { $(this).remove(); });
+	$('#improve-send').fadeOut(100, function() { $(this).remove(); });
 	return;
 }
 
@@ -449,9 +469,53 @@ function checkLoad() {
 	}
 }
 
+
+function Improve() {
+	menuOpened = true;
+	const popup = document.getElementById('popup');
+	popup.classList.add('popup-improve');
+	$('#buttons').hide();
+	popup.classList.remove('popup-open');	
+
+
+	// title text
+	//textbox
+	
+	var title = document.createElement("p");
+	title.id = 'improve-title';
+	title.innerText = "Please share your experience and opinion about the website or ideas on how to improve it.";
+	var text = document.createElement("textarea");
+	text.id = 'improve-text';
+	var form = document.createElement("form");
+	form.setAttribute("data-netlify", "true");
+	var send = document.createElement("button");
+	send.id = 'improve-send';
+	send.type = "submit";
+	send.innerText = "Send";
+	
+	
+	form.appendChild(text);
+	form.appendChild(send);
+	
+	popup.appendChild(title);
+	popup.appendChild(form);
+
+
+	// CLOSE
+	document.getElementById('options').setAttribute("onClick", "closeOptions()");
+	setTimeout(function(){
+		window.addEventListener( "click", clickOutside);
+	}, 500);
+}
+
+
+
 if(screen.width <= 900) {
 
 } else {
+	
+
+
 	// Inform the user about the keybord shortcuts
 	function infoPopup() {
 		var div = document.createElement("div");
@@ -493,71 +557,68 @@ if(screen.width <= 900) {
 				$('#info-popup-div').fadeOut( 300, function() { $(this).remove(); } );
 		}, 10000);
 	})
+	// KEYBOARD SHORTCUTS
+
+
+	// stop keybord shortcuts
+	$('#newTask, #colorInput').focus(function() {
+		menuOpened = true;
+	})
+
+	$('#newTask, #colorInput').focusout( function() {
+		menuOpened = false;
+	})
+
+
+	// s, S for Save
+	$(document).on("keypress", function(e) {
+		if(e.key == 's' && !menuOpened || e.key == 'S' && !menuOpened) {
+			Save();
+			$('#save-input').val('');
+		}
+	})
+
+	// l, L for Save
+	$(document).on("keypress", function(e) {
+		if(e.key == 'l' && !menuOpened || e.key == 'L' && !menuOpened) {
+			Load();
+		}
+	})
+
+	// m, M for Save
+	$(document).on("keypress", function(e) {
+		if(e.key == 'm' && !menuOpened || e.key == 'M' && !menuOpened) {
+			Send();
+		}
+	})
+
+
+	// Esc for exit
+	$(document).on("keyup", function(e) {
+		if(e.key == 'Escape') {
+			if(menuOpened) {
+				closeOptions();
+			}
+		}
+	})
+
+	// i for input new task
+	$(document).on("keypress", function(e) {
+		if(e.key == 'i' && !menuOpened) {
+			setTimeout(function() {
+				$('#newTask').focus();
+			}, 50);
+		}
+	})
+
+	$(document).on("keyup", function(e) {
+		if(e.key == 'Escape') {
+			if($('#newTask'.focus)) {
+				$('#newTask').blur();
+			}
+		}
+	})
 }
-
-// KEYBOARD SHORTCUTS
-
-
-// stop keybord shortcuts
-$('#newTask, #colorInput').focus(function() {
-	menuOpened = true;
-})
-
-$('#newTask, #colorInput').focusout( function() {
-	menuOpened = false;
-})
-
-
-// s, S for Save
-$(document).on("keypress", function(e) {
-	if(e.key == 's' && !menuOpened || e.key == 'S' && !menuOpened) {
-		Save();
-		$('#save-input').val('');
-	}
-})
-
-// l, L for Save
-$(document).on("keypress", function(e) {
-	if(e.key == 'l' && !menuOpened || e.key == 'L' && !menuOpened) {
-		Load();
-	}
-})
-
-// m, M for Save
-$(document).on("keypress", function(e) {
-	if(e.key == 'm' && !menuOpened || e.key == 'M' && !menuOpened) {
-		Send();
-	}
-})
-
-
-// Esc for exit
-$(document).on("keyup", function(e) {
-	if(e.key == 'Escape') {
-		if(menuOpened) {
-			closeOptions();
-		}
-	}
-})
-
-// i for input new task
-$(document).on("keypress", function(e) {
-	if(e.key == 'i' && !menuOpened) {
-		setTimeout(function() {
-			$('#newTask').focus();
-		}, 50);
-	}
-})
-
-$(document).on("keyup", function(e) {
-	if(e.key == 'Escape') {
-		if($('#newTask'.focus)) {
-			$('#newTask').blur();
-		}
-	}
-})
-
-
 
 // focus on input at startup 
 $('#newTask').focus();

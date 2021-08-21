@@ -304,6 +304,7 @@ body {
 	flex-direction: column;
 }
 
+.title-display label,
 #improve,
 #save,
 #load,
@@ -320,11 +321,28 @@ body {
 	margin: auto;
 }
 
-#improve {
-	font-weight: 300;
-	width: 70px;
+.title-display {
+	display: flex !important;
+	flex-direction: row !important;
+	height: 30px;
 	margin: auto;
 }
+
+.title-display label {
+	margin: 0 !important;
+	padding: 0 !important;
+	font-size: 16px !important;
+}
+
+.title-display input {
+	margin-top: 5px;
+	margin-right: 10px;
+}
+
+.title-first {
+	margin-top: 15px;
+}
+
 
 #save:active,
 #load:active,
@@ -337,10 +355,15 @@ body {
 }
 
 
+.menu-date {
+
+}
+
+
 .popup-open {
 	opacity: 100% !important;
-	width: 150px !important;
-	height: 190px !important;
+	width: 180px !important;
+	height: 260px !important;
 }
 
 .popup-save {
@@ -560,6 +583,79 @@ body {
 	}
 }
 
+
+.popup-improve {
+	opacity: 100% !important;
+	height: 600px !important;
+	width: 500px !important;
+}
+
+#improve-title {
+	width: 420px;
+	margin: auto;
+	font-size: 20px;
+	margin-top: 100px;
+	margin-bottom: 50px;
+	font-family: "Lato", "Helvetica";
+	font-size: 20px;
+	font-weight: 400;
+	
+}
+
+#improve-text {
+	resize: none;
+	width: 420px;
+	height: 300px;;
+	margin: 0 auto;
+	display: block;
+	margin-top: 20px;
+	padding: 20px;
+	background-color: transparent;
+	border: 1.5px solid #202020;
+	border-radius: 5px;
+	font-family: "Lato", "Helvetica";
+	font-size: 18px;
+	font-weight: 400;
+}
+
+#improve-send {
+	font-family: "Lato", "Helvetica";
+	font-size: 16px;
+	font-weight: 400;
+	width: 100px;
+	height: 40px;
+	outline: none;
+	border: none;
+	text-decoration: none;
+	background-color: #EEE;
+	border-radius: 50px;
+	position: relative;
+	left: 330px;
+	top: 20px;
+}
+
+
+@media only screen and (max-width: 900px){
+	.popup-improve {
+		height: 90% !important;
+		width: 100% !important;
+		top: 80px !important;
+		right: 0vw !important;
+	}
+
+	#improve-text,
+	#improve-title {
+		width: 80%;
+	}
+
+	#improve-title {
+		margin-top: 40px;
+	}
+
+	#improve-send {
+		left: 60%;
+	}
+}
 
 #info-popup-div {
 	position: fixed;
